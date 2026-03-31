@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -10,7 +11,17 @@ function isLoggedIn(req, res, next) {
   req.user ? next() : res.sendStatus(401);
 }
 
-app.use(session({ secret: 'cats', resave: false, saveUninitialized: true }));
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    httpOnly: true, 
+    secure: false,  //set true when deploy
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000 // 1d
+  }
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
