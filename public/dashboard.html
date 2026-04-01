@@ -1,2 +1,89 @@
-<h1>Daffa Epstein Noor</h1>
-<a href="/logout">Logout</a>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        /* CSS Variables untuk Light Mode (Default) */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+        }
+
+        /* CSS Variables untuk Dark Mode */
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+        }
+
+        /* Terapkan variabel ke elemen body */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s; /* Efek transisi halus */
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        /* Sembunyikan tombol tema secara default */
+        #themeToggleBtn {
+            display: none; 
+            margin-top: 20px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Selamat datang, <span id="userName">Loading...</span></h1>
+    <a href="/logout" style="color: red;">Logout</a>
+    <br>
+    
+    <button id="themeToggleBtn">Ubah Tema (Dark/Light)</button>
+
+    <script>
+        //Cek apakah ada preferensi tema yang tersimpan di browser user
+        const currentTheme = localStorage.getItem('website_theme');
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        //Ambil data user dari backend (Node.js)
+        fetch('/api/user')
+            .then(response => response.json())
+            .then(user => {
+                // Tampilkan nama user
+                document.getElementById('userName').innerText = user.name || 'User';
+
+                //Tampilkan tombol HANYA jika canChangeTheme bernilai true
+                if (user.canChangeTheme) {
+                    const themeBtn = document.getElementById('themeToggleBtn');
+                    themeBtn.style.display = 'block'; // Munculkan tombol
+
+                    // Berikan logika klik pada tombol
+                    themeBtn.addEventListener('click', () => {
+                        // Toggle (tambah/hapus) class 'dark-mode' pada body
+                        document.body.classList.toggle('dark-mode');
+                        
+                        // Simpan preferensi agar tema tidak berubah saat halaman di-refresh
+                        if (document.body.classList.contains('dark-mode')) {
+                            localStorage.setItem('website_theme', 'dark');
+                        } else {
+                            localStorage.setItem('website_theme', 'light');
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Gagal mengambil data user:', error);
+                document.getElementById('userName').innerText = 'Gagal memuat nama';
+            });
+    </script>
+</body>
+</html>
