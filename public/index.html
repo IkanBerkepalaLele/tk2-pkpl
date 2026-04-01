@@ -1,13 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Login Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biodata Kelompok TK2-PKPL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-    <h5>Ghozam Muliawan Sholihin</h5>
-    
-    <a href="/auth/google" style="padding: 10px; background: #4285F4; color: white; text-decoration: none;">
-        Login
-    </a>
+    <main class="page-shell">
+        <section class="hero">
+            <div class="hero-copy">
+                <h1>Biodata Kelompok Keluarga Cinta Pak Amril</h1>
+                <div class="hero-actions">
+                    <a href="/auth/google" class="primary-link" id="auth-link">Login dengan Google</a>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="member-section" id="anggota">
+            <div class="section-heading">
+                <p class="eyebrow">Anggota Kelompok</p>
+            </div>
+
+            <div class="member-grid">
+                <article class="member-card">
+                    <img src="/images/ghozam.svg" alt="Foto profil Ghozam Muliawan Sholihin" class="member-photo" data-photo-base="ghozam" />
+                    <div class="member-body">
+                        <h3>Ghozam Muliawan Sholihin</h3>
+                        <dl class="member-list">
+                            <div>
+                                <dt>NPM</dt>
+                                <dd>-</dd>
+                            </div>
+                            <div>
+                                <dt>Prodi</dt>
+                                <dd>-</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+
+                <article class="member-card">
+                    <img src="/images/daffa.svg" alt="Foto profil Daffa Abhinaya Avesinanoor" class="member-photo" data-photo-base="daffa" />
+                    <div class="member-body">
+                        <h3>Daffa Abhinaya Avesinanoor</h3>
+                        <dl class="member-list">
+                            <div>
+                                <dt>NPM</dt>
+                                <dd>-</dd>
+                            </div>
+                            <div>
+                                <dt>Prodi</dt>
+                                <dd>-</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+
+                <article class="member-card">
+                    <img src="/images/fakhri.svg" alt="Foto profil Fakhri Husaini Romza" class="member-photo" data-photo-base="fakhri" />
+                    <div class="member-body">
+                        <h3>Fakhri Husaini Romza</h3>
+                        <dl class="member-list">
+                            <div>
+                                <dt>NPM</dt>
+                                <dd>-</dd>
+                            </div>
+                            <div>
+                                <dt>Prodi</dt>
+                                <dd>-</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+
+                <article class="member-card">
+                    <img src="/images/afero.svg" alt="Foto profil Afero Aqil Roihan" class="member-photo" data-photo-base="afero" />
+                    <div class="member-body">
+                        <h3>Afero Aqil Roihan</h3>
+                        <dl class="member-list">
+                            <div>
+                                <dt>NPM</dt>
+                                <dd>-</dd>
+                            </div>
+                            <div>
+                                <dt>Prodi</dt>
+                                <dd>-</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+
+                <article class="member-card">
+                    <img src="/images/haikal.svg" alt="Foto profil Ahmad Haikal Najmuddin" class="member-photo" data-photo-base="haikal" />
+                    <div class="member-body">
+                        <h3>Ahmad Haikal Najmuddin</h3>
+                        <dl class="member-list">
+                            <div>
+                                <dt>NPM</dt>
+                                <dd>-</dd>
+                            </div>
+                            <div>
+                                <dt>Prodi</dt>
+                                <dd>-</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const preferredPhotoExtensions = ['png', 'jpg', 'jpeg', 'svg'];
+
+        document.querySelectorAll('[data-photo-base]').forEach((img) => {
+            const baseName = img.dataset.photoBase;
+            let currentExtensionIndex = 0;
+
+            const loadNextPhoto = () => {
+                if (currentExtensionIndex >= preferredPhotoExtensions.length) {
+                    return;
+                }
+
+                const extension = preferredPhotoExtensions[currentExtensionIndex];
+                currentExtensionIndex += 1;
+                img.src = `/images/${baseName}.${extension}`;
+            };
+
+            img.addEventListener('error', loadNextPhoto);
+            loadNextPhoto();
+        });
+
+        const authLink = document.getElementById('auth-link');
+
+        fetch('/api/session')
+            .then((response) => response.json())
+            .then((session) => {
+                if (!authLink || !session.loggedIn) {
+                    return;
+                }
+
+                authLink.href = '/logout';
+                authLink.textContent = 'Logout';
+            })
+            .catch(() => {
+                // Biarkan tombol tetap mengarah ke login jika status sesi gagal dimuat.
+            });
+    </script>
 </body>
 </html>
