@@ -9,6 +9,7 @@ const app = express();
 
 app.disable('x-powered-by');
 app.use(express.json());
+app.use(express.static('public'));
 
 if (!process.env.SESSION_SECRET) {
   throw new Error('SESSION_SECRET is required.');
