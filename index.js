@@ -56,4 +56,28 @@ app.get('/auth/google/failure', (req, res) => {
   res.send('Failed to authenticate');
 });
 
+// 1. Definisikan email tim yang diizinkan mengubah tema
+const allowedEmails = [
+  'mernawatispeed08@gmail.com', // Email Anda
+  'ehgojim@gmail.com',
+];
+
+// endpoint API untuk mengirim data user ke frontend
+app.get('/api/user', isLoggedIn, (req, res) => {
+  // Ambil email user dari data profil Google
+  const userEmail = req.user.emails && req.user.emails.length > 0 
+    ? req.user.emails[0].value 
+    : null;
+
+  // Cek apakah email user ada di dalam daftar allowedEmails
+  const canChangeTheme = allowedEmails.includes(userEmail);
+
+  // Kirim data dalam format JSON
+  res.json({
+    name: req.user.displayName,
+    email: userEmail,
+    canChangeTheme: canChangeTheme
+  });
+});
+
 app.listen(5000, () => console.log('listening on port: 5000'));
