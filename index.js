@@ -1,10 +1,11 @@
 require('dotenv').config();
+require('./auth');
+
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-require('./auth');
-
 const app = express();
+
 app.use(express.static('public'));
 
 function isLoggedIn(req, res, next) {
@@ -19,9 +20,10 @@ app.use(session({
     httpOnly: true, 
     secure: false,  //set true when deploy
     sameSite: 'lax',
-    maxAge: 24 * 60 * 60 * 1000 // 1d
+    maxAge: 60 * 60 * 1000 // 1h
   }
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
