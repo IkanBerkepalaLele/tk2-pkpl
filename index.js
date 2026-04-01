@@ -58,8 +58,11 @@ app.get('/auth/google/failure', (req, res) => {
 
 // 1. Definisikan email tim yang diizinkan mengubah tema
 const allowedEmails = [
-  'mernawatispeed08@gmail.com', // Email Anda
+  'mernawatispeed08@gmail.com', 
   'ehgojim@gmail.com',
+  'ahaikaln@gmail.com',
+  'husainifakhriromza@gmail.com',
+  'daffaabhi86gmail.com'
 ];
 
 // endpoint API untuk mengirim data user ke frontend
