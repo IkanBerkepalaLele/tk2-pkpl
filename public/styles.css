@@ -290,3 +290,29 @@ dd {
     grid-template-columns: 1fr;
   }
 }
+body {
+    /* Tambahkan transisi 'background' secara umum agar perubahannya halus */
+    transition: background 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+  /* Timpa efek radial-gradient bawaan agar background benar-benar hitam pekat */
+  background: #000000; 
+  
+  --bg: #000000;
+  
+  /* Warna card (kartu) dibuat abu-abu sangat gelap agar tidak menyatu dengan background */
+  --surface: rgba(15, 15, 15, 0.95); 
+  --surface-strong: #0f0f0f;
+  
+  --text: #e0e0e0;
+  --muted: #a0a0a0;
+  
+  /* Garis batas (border) card dibuat sedikit lebih terang agar card tetap terlihat bentuknya */
+  --line: rgba(255, 255, 255, 0.15); 
+  
+  --accent: #14b8a6;
+  --accent-deep: #2dd4bf;
+  --accent-soft: rgba(17, 94, 89, 0.2); 
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.8);
+}

@@ -36,16 +36,10 @@ function isLoggedIn(req, res, next) {
 }
 
 const allowedEmails = new Set(
-  (process.env.ALLOWED_EMAILS || [
-    'mernawatispeed08@gmail.com',
-    'ehgojim@gmail.com',
-    'ahaikaln@gmail.com',
-    'husainifakhriromza@gmail.com',
-    'daffaabhi86@gmail.com'
-  ].join(','))
+  (process.env.ALLOWED_EMAILS || '')
     .split(',')
     .map((email) => email.trim().toLowerCase())
-    .filter(Boolean)
+    .filter(Boolean) // Filter ini akan mengabaikan string kosong
 );
 
 function getUserEmail(user) {
@@ -96,18 +90,10 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-    successRedirect: '/protected',
+    successRedirect: '/',
     failureRedirect: '/auth/google/failure'
   })
 );
-
-app.get('/protected', isLoggedIn, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
-
-app.get('/dashboard.html', isLoggedIn, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
 
 app.get('/logout', (req, res, next) => {
   if (req.logout.length > 0) {
@@ -133,12 +119,17 @@ app.get('/auth/google/failure', (req, res) => {
 });
 
 // endpoint API untuk mengirim data user ke frontend
-app.get('/api/user', isLoggedIn, (req, res) => {
-  res.json({
-    name: req.user.displayName,
-    email: req.authz.email,
-    canChangeTheme: req.authz.canChangeTheme
-  });
+app.get('/api/user', (req, res) => {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    res.json({
+      loggedIn: true,
+      name: req.user.displayName,
+      email: req.authz.email,
+      canChangeTheme: req.authz.canChangeTheme
+    });
+  } else {
+    res.json({ loggedIn: false }); // Jika belum login
+  }
 });
 
 let themeState = {
@@ -147,7 +138,7 @@ let themeState = {
   updatedAt: null
 };
 
-app.get('/api/theme', isLoggedIn, (req, res) => {
+app.get('/api/theme', (req, res) => {
   res.json(themeState);
 });
 

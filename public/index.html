@@ -14,11 +14,11 @@
         <section class="hero">
             <div class="hero-copy">
                 <h1>Biodata Kelompok Keluarga Cinta Pak Amril</h1>
-                <div class="hero-actions">
-                    <a href="/auth/google" class="primary-link" id="auth-link">Login dengan Google</a>
+                
+                <div class="hero-actions" id="auth-section">
+                    <p style="color: var(--muted);">Memuat status...</p>
                 </div>
             </div>
-
         </section>
 
         <section class="member-section" id="anggota">
@@ -116,6 +116,7 @@
     </main>
 
     <script>
+        // --- 1. Logika Fallback Gambar (Dipertahankan dari aslinya) ---
         const preferredPhotoExtensions = ['png', 'jpg', 'jpeg', 'svg'];
 
         document.querySelectorAll('[data-photo-base]').forEach((img) => {
@@ -126,7 +127,6 @@
                 if (currentExtensionIndex >= preferredPhotoExtensions.length) {
                     return;
                 }
-
                 const extension = preferredPhotoExtensions[currentExtensionIndex];
                 currentExtensionIndex += 1;
                 img.src = `/images/${baseName}.${extension}`;
@@ -136,21 +136,82 @@
             loadNextPhoto();
         });
 
-        const authLink = document.getElementById('auth-link');
+        // --- 2. Logika Authorization & Tema (Pengganti dashboard.html) ---
+        function applyTheme(mode) {
+            document.body.classList.toggle('dark-mode', mode === 'dark');
+        }
 
-        fetch('/api/session')
-            .then((response) => response.json())
-            .then((session) => {
-                if (!authLink || !session.loggedIn) {
-                    return;
+        async function initPage() {
+            try {
+                // Ambil state tema global dari server
+                const themeRes = await fetch('/api/theme');
+                if (themeRes.ok) {
+                    const theme = await themeRes.json();
+                    applyTheme(theme.mode);
                 }
 
-                authLink.href = '/logout';
-                authLink.textContent = 'Logout';
-            })
-            .catch(() => {
-                // Biarkan tombol tetap mengarah ke login jika status sesi gagal dimuat.
-            });
+                // Cek status otorisasi user ke server
+                const userRes = await fetch('/api/user');
+                const user = await userRes.json();
+                const authSection = document.getElementById('auth-section');
+
+                if (user.loggedIn) {
+                    // Tampilan Jika User SUDAH LOGIN
+                    let html = `
+                        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                            <p style="margin: 0; font-weight: 700; color: var(--text);">Selamat datang, ${user.name}</p>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <a href="/logout" class="secondary-link" style="color: #ef4444; border-color: #ef4444;">Logout</a>
+                    `;
+
+                    // Jika user ada di allowedEmails (Editor Tema), tambahkan tombol ubah tema
+                    if (user.canChangeTheme) {
+                        html += `<button id="themeToggleBtn" class="primary-link" style="border: none; cursor: pointer;">Ubah Tema Tampilan</button>`;
+                    }
+                    
+                    html += `</div></div>`;
+                    authSection.innerHTML = html;
+
+                    // Berikan fungsi klik pada tombol ubah tema (jika tombolnya ada)
+                    if (user.canChangeTheme) {
+                        document.getElementById('themeToggleBtn').addEventListener('click', async () => {
+                            const nextMode = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+                            
+                            try {
+                                const result = await fetch('/api/theme', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ mode: nextMode })
+                                });
+                                
+                                if (result.ok) {
+                                    const data = await result.json();
+                                    applyTheme(data.theme.mode); // Ubah tema secara real-time
+                                } else {
+                                    alert('Gagal mengubah tema: Anda tidak memiliki akses editor.');
+                                }
+                            } catch (error) {
+                                console.error('Gagal mengubah tema:', error);
+                            }
+                        });
+                    }
+                } else {
+                    // Tampilan Jika User BELUM LOGIN
+                    authSection.innerHTML = `
+                        <a href="/auth/google" class="primary-link" id="auth-link">Login dengan Google</a>
+                    `;
+                }
+            } catch (error) {
+                // Jika server tidak bisa dihubungi atau error lainnya
+                console.error('Gagal memuat status sesi:', error);
+                document.getElementById('auth-section').innerHTML = `
+                    <a href="/auth/google" class="primary-link" id="auth-link">Login dengan Google</a>
+                `;
+            }
+        }
+
+        // Jalankan fungsi saat halaman dimuat
+        initPage();
     </script>
 </body>
 </html>
