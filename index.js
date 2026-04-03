@@ -39,7 +39,7 @@ const allowedEmails = new Set(
   (process.env.ALLOWED_EMAILS || '')
     .split(',')
     .map((email) => email.trim().toLowerCase())
-    .filter(Boolean) // Filter ini akan mengabaikan string kosong
+    .filter(Boolean) // Filter yg mengabaikan string kosong
 );
 
 function getUserEmail(user) {
